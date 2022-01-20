@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+    <title>Document</title>
+    <style>
+        .active {
+            color: red;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- {{}} <= これが一瞬表示されるときの対策としてv-cloakを利用する -->
+    <div id="app" v-cloak>
+        {{ totalPrice }}
+        <button v-on:click="btnClicked">クリックしてね</button>
+        <button @click="btnClickedEvent">クリックしてね</button>
+        <button @click="btnClickedArgs(1)">クリックしてね</button>
+        <button @click="btnClickedArgsEvent(1, $event)">クリックしてね</button>
+        <br>
+        {{ message }}
+        <br>
+        <!-- v-bind -->
+        <a v-bind:href="google">google</a>
+        <br>
+        <!-- v-bindの省略記法 -->
+        <a :href="google">google</a>
+
+        <br>
+        <a :href="book.url">{{ book.title }}</a>
+        <br>
+
+        <!-- tagの属性をv-bindで指定 -->
+        <input v-bind="{name: formInput.name, placeholder: formInput.placeholder}">
+        <input v-bind="formInput">
+        <br>
+
+        <!-- v-bindとstyle-->
+        <div :style="{fontSize:fontSize}">Styleテスト</div>
+
+        <!-- クラスを付与したり消したりする(Ex)activeクラス) -->
+        <div :class="{active:isActive}">クラスのテスト</div>
+
+        <!-- v-show -->
+        <div v-show="isDisplay">表示↓は消えてる(isDisplayはtrue)</div>
+        <div v-show="!isDisplay">表示↑は消えてる(isDisplayはfalse)</div>
+
+        <!-- v-if -->
+        <div v-if="isDisplay">ifで表示</div>
+        <div v-if="isDisplay === false">ifで表示します</div>
+
+        <!-- v-for value in values(array)-->
+        <ul>
+            <li v-for="member in members">
+                {{ member }}
+            </li>
+        </ul>
+
+        <!-- v-for (key. value) in values(array)-->
+        <ul>
+            <li v-for="(member, index) in members">
+                <h1>{{ index }}</h1>
+                <h2>{{ member }}</h2>
+            </li>
+        </ul>
+
+        <!-- v-for value in object(Object) -->
+        <ul>
+            <li v-for="value in book">
+                {{ value }}
+            </li>
+        </ul>
+
+        <!-- v-for (value, key) in object -->
+        <ul>
+            <li v-for="(value, key) in book">
+                {{ key }} : {{ value }}
+            </li>
+        </ul>
+
+        <!-- v-for (value, key, index) in object -->
+        <ul>
+            <li v-for="(value, key, index) in book">
+                {{ index }} : {{ key }} : {{ value }}
+            </li>
+        </ul>
+
+        <!-- 複数のオブジェクトv-for -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>タイトル</th>
+                    <th>著者</th>
+                    <th>URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="book in books" :key="book.id">
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.url }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- v-text/v-html -->
+        <div v-text="test"></div>
+        <div v-html="test"></div>
+
+        <!-- Ajax -->
+        <form>
+            <button id="prevent" type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+
+</html>
