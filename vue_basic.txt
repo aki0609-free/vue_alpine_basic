@@ -1,4 +1,0 @@
-[manipulate]
-操作する
-[OOTB(out of the box)]
-IT分野では製品などを入手後にすぐ使えるという意味の慣用表現

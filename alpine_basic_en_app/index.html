@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vue Basics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    [x-cloak] {
+      display: none;
+    }
+  </style>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="data()" x-cloak>
+  <header>
+    <h1>Monster Slayer</h1>
+  </header>
+  <div id="game">
+    <section id="monster" class="container">
+      <h2>Monster Health</h2>
+      <div class="healthbar">
+        <div class="healthbar__value" x-bind:style="monsterBarStyles"></div>
+      </div>
+    </section>
+    <section id="player" class="container">
+      <h2>Your Health</h2>
+      <div class="healthbar">
+        <div class="healthbar__value" x-bind:style="playerBarStyles"></div>
+      </div>
+      <template x-if="winner">
+        <section class="container">
+          <template x-if="winner">
+            <h2>Game Over!</h2>
+          </template>
+          <template x-if="winner === 'monster'">
+            <h3>You lost!</h3>
+          </template>
+          <template x-if="winner === 'player'">
+            <h3>You won!</h3>
+          </template>
+          <template x-if="winner === 'draw'">
+            <h3>It's a draw!</h3>
+          </template>
+          <button @click="startGame">Start New Game</button>
+        </section>
+      </template>
+    </section>
+    <template x-if="!winner">
+      <section id="controls">
+        <button x-on:click="attackMonster">ATTACK</button>
+        <button x-bind:disabled="mayUseSpecialAttack" x-on:click="specialAttackMonster">SPECIAL ATTACK</button>
+        <button x-on:click="healPlayer">HEAL</button>
+        <button x-on:click="surrender">SURRENDER</button>
+      </section>
+    </template>
+    <section id="log" class="container">
+      <h2>Battle Log</h2>
+      <ul>
+        <template x-for="(log, index) in logMessages" :key="index">
+          <li x-bind:class="{'log--player': log.actionBy === 'player', 'log--monster': log.actionBy === 'monster'}"
+            x-text="(index + 1) + ':' + log.actionBy + '-' + log.actionType + '-' + log.actionValue"></li>
+        </template>
+      </ul>
+    </section>
+  </div>
+  <script>
+    const data = () => ({
+      //プロパティはそのままリアクティブになる(Vueにおけるdataプロパティ)
+      playerHealth: 100,
+      monsterHealth: 100,
+      currentRound: 0,
+      winner: null,
+      logMessages: [],
+
+
+      //methods
+      startGame() {
+        this.playerHealth = 100;
+        this.monsterHealth = 100;
+        this.currentRound = 0;
+        this.winner = null;
+        this.logMessages = [];
+      },
+
+      getRandomValue(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+      },
+
+      attackMonster() {
+        this.currentRound++;
+        const attackValue = this.getRandomValue(5, 12);
+        this.addLogMessage('player', 'attack', attackValue);
+        this.monsterHealth -= attackValue;
+        this.attackPlayer();
+      },
+
+      attackPlayer() {
+        const attackValue = this.getRandomValue(8, 15);
+        this.addLogMessage('monster', 'attack', attackValue);
+        this.playerHealth -= attackValue;
+      },
+
+      specialAttackMonster() {
+        this.currentRound++;
+        const attackValue = this.getRandomValue(10, 25);
+        this.addLogMessage('player', 'attack', attackValue);
+        this.monsterHealth -= attackValue;
+        this.attackPlayer();
+      },
+
+      healPlayer() {
+        this.currentRound++;
+        const healValue = this.getRandomValue(8, 20);
+        this.addLogMessage('player', 'heal', healValue);
+        this.attackPlayer();
+        return this.playerHealth + healValue > 100 ? 100 : this.playerHealth += healValue;
+      },
+
+      surrender() {
+        this.winner = 'monster';
+      },
+
+      addLogMessage(who, what, value) {
+        this.logMessages.push({
+          actionBy: who,
+          actionType: what,
+          actionValue: value
+        });
+      },
+
+      //computed
+      get monsterBarStyles() {
+        if (this.monsterHealth <= 0) {
+          return { width: '0%' };
+        }
+        return { width: this.monsterHealth + '%' };
+      },
+
+      get playerBarStyles() {
+        if (this.playerHealth <= 0) {
+          return { width: '0%' };
+        }
+        return { width: this.playerHealth + '%' };
+      },
+
+      get mayUseSpecialAttack() {
+        return this.currentRound % 3 !== 0;
+      },
+
+      init() {
+        
+        // watch
+        this.$watch('playerHealth', (currentValue) => {
+          console.log(currentValue);
+          if (currentValue <= 0 && this.monsterHealth <= 0) {
+            this.winner = 'draw';
+          } else if (currentValue <= 0) {
+            this.winner = 'monster';
+          }
+        });
+        this.$watch('monsterHealth', (currentValue) => {
+          if (currentValue <= 0 && this.playerHealth <= 0) {
+            this.winner = 'draw';
+          } else if (currentValue <= 0) {
+            this.winner = 'player';
+          }
+        });
+      }
+    })
+
+  </script>
+</body>
+
+</html>
